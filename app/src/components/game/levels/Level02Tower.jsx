@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LEVEL_2_DATA, CATEGORIES_LEVEL_2 } from '../../../data/levels';
 import { LOCATIONS, EFFECTS, BADGES } from '../../../data/assets';
 import { shuffleArray } from '../../../utils/shuffle';
+import audioManager from '../../../utils/audioManager';
 import Character from '../ui/Character';
 import DialogueBox from '../ui/DialogueBox';
 import StatementCard from '../ui/StatementCard';
 import Stars from '../ui/Stars';
 import ProgressBar from '../ui/ProgressBar';
+import SoundToggle from '../ui/SoundToggle';
 
 // Фази рівня
 const PHASES = {
@@ -89,6 +91,34 @@ export default function Level02Tower({ onComplete, onExit, onNextLevel }) {
       setShuffledQuestions(shuffleArray(data.questions));
     }
   }, [phase, isRetryMode, shuffledQuestions.length, data.questions]);
+
+  // Відтворення аудіо при зміні діалогу
+  useEffect(() => {
+    // Визначаємо фазу для аудіо
+    let audioPhase = null;
+    if (phase === PHASES.INTRO) audioPhase = 'intro';
+    else if (phase === PHASES.TUTORIAL) audioPhase = 'tutorial';
+    else if (phase === PHASES.OUTRO) audioPhase = 'outro';
+
+    if (audioPhase) {
+      // Індекс аудіо файлу (1-based)
+      const audioIndex = dialogueIndex + 1;
+      // Level 2 - female voice (Сова-страж)
+      audioManager.playDialogue(2, 'female', audioPhase, audioIndex);
+    }
+
+    // Зупиняємо аудіо при виході з діалогової фази
+    return () => {
+      if (phase !== PHASES.INTRO && phase !== PHASES.TUTORIAL && phase !== PHASES.OUTRO) {
+        audioManager.stop();
+      }
+    };
+  }, [phase, dialogueIndex]);
+
+  // Зупиняємо аудіо при unmount
+  useEffect(() => {
+    return () => audioManager.stop();
+  }, []);
 
   // Форматирование времени
   const formatTime = (seconds) => {
@@ -588,6 +618,9 @@ export default function Level02Tower({ onComplete, onExit, onNextLevel }) {
         className="game-background"
         style={{ backgroundImage: `url(${LOCATIONS.tower})` }}
       />
+
+      {/* Кнопка звуку */}
+      <SoundToggle />
 
       <div className="game-screen">
         {renderPhase()}

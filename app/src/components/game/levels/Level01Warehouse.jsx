@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LEVEL_1_DATA, CATEGORIES } from '../../../data/levels';
 import { LOCATIONS, EFFECTS, BADGES } from '../../../data/assets';
 import { shuffleArray } from '../../../utils/shuffle';
+import audioManager from '../../../utils/audioManager';
 import Character from '../ui/Character';
 import DialogueBox from '../ui/DialogueBox';
 import StatementCard from '../ui/StatementCard';
 import Box from '../ui/Box';
 import Stars from '../ui/Stars';
 import ProgressBar from '../ui/ProgressBar';
+import SoundToggle from '../ui/SoundToggle';
 
 // Фази рівня
 const PHASES = {
@@ -95,6 +97,33 @@ export default function Level01Warehouse({ onComplete, onExit, onNextLevel }) {
       setShuffledQuestions(shuffleArray(data.questions));
     }
   }, [phase, isRetryMode, shuffledQuestions.length, data.questions]);
+
+  // Відтворення аудіо при зміні діалогу
+  useEffect(() => {
+    // Визначаємо фазу для аудіо
+    let audioPhase = null;
+    if (phase === PHASES.INTRO) audioPhase = 'intro';
+    else if (phase === PHASES.TUTORIAL) audioPhase = 'tutorial';
+    else if (phase === PHASES.OUTRO) audioPhase = 'outro';
+
+    if (audioPhase) {
+      // Індекс аудіо файлу (1-based)
+      const audioIndex = dialogueIndex + 1;
+      audioManager.playDialogue(1, 'robot', audioPhase, audioIndex);
+    }
+
+    // Зупиняємо аудіо при виході з діалогової фази
+    return () => {
+      if (phase !== PHASES.INTRO && phase !== PHASES.TUTORIAL && phase !== PHASES.OUTRO) {
+        audioManager.stop();
+      }
+    };
+  }, [phase, dialogueIndex]);
+
+  // Зупиняємо аудіо при unmount
+  useEffect(() => {
+    return () => audioManager.stop();
+  }, []);
 
   // Форматирование времени
   const formatTime = (seconds) => {
@@ -588,6 +617,9 @@ export default function Level01Warehouse({ onComplete, onExit, onNextLevel }) {
         className="game-background"
         style={{ backgroundImage: `url(${LOCATIONS.warehouse})` }}
       />
+
+      {/* Кнопка звуку */}
+      <SoundToggle />
 
       <div className="game-screen">
         {renderPhase()}

@@ -2,10 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getLevelData } from '../../../data/levels';
 import { LOCATIONS, EFFECTS, BADGES } from '../../../data/assets';
 import { shuffleArray } from '../../../utils/shuffle';
+import audioManager from '../../../utils/audioManager';
 import Character from '../ui/Character';
 import DialogueBox from '../ui/DialogueBox';
 import Stars from '../ui/Stars';
 import ProgressBar from '../ui/ProgressBar';
+import SoundToggle from '../ui/SoundToggle';
+
+// Маппінг голосів для кожного рівня
+const LEVEL_VOICES = {
+  3: 'male',       // Професор Доказ
+  4: 'male',       // Садівник Корінь
+  5: 'female',     // Суддя Правда
+  6: 'male',       // Розвідник Зір
+  7: 'female',     // Дзеркальник Відблиск
+  8: 'female',     // Актор Голос (theatrical -> female)
+  9: 'male',       // Продавець Гучний
+  10: 'female',    // Архіваріус Сторінка
+  11: 'male',      // Картограф Контур
+  12: 'male',      // Слизький Виверт
+  13: 'male'       // Мер Правдоруб
+};
 
 // Фази рівня
 const PHASES = {
@@ -124,6 +141,35 @@ export default function UniversalLevel({ levelId, onComplete, onExit, onNextLeve
       setShuffledQuestions(shuffleArray(data.questions));
     }
   }, [phase, isRetryMode, shuffledQuestions.length, data.questions]);
+
+  // Відтворення аудіо при зміні діалогу
+  useEffect(() => {
+    // Визначаємо фазу для аудіо
+    let audioPhase = null;
+    if (phase === PHASES.INTRO) audioPhase = 'intro';
+    else if (phase === PHASES.TUTORIAL) audioPhase = 'tutorial';
+    else if (phase === PHASES.OUTRO) audioPhase = 'outro';
+
+    if (audioPhase) {
+      // Індекс аудіо файлу (1-based)
+      const audioIndex = dialogueIndex + 1;
+      // Отримуємо голос для цього рівня
+      const voice = LEVEL_VOICES[levelId] || 'male';
+      audioManager.playDialogue(levelId, voice, audioPhase, audioIndex);
+    }
+
+    // Зупиняємо аудіо при виході з діалогової фази
+    return () => {
+      if (phase !== PHASES.INTRO && phase !== PHASES.TUTORIAL && phase !== PHASES.OUTRO) {
+        audioManager.stop();
+      }
+    };
+  }, [phase, dialogueIndex, levelId]);
+
+  // Зупиняємо аудіо при unmount
+  useEffect(() => {
+    return () => audioManager.stop();
+  }, []);
 
   // Форматування часу
   const formatTime = (seconds) => {
@@ -748,6 +794,9 @@ export default function UniversalLevel({ levelId, onComplete, onExit, onNextLeve
         className="game-background"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
+
+      {/* Кнопка звуку */}
+      <SoundToggle />
 
       <div className="game-screen">
         {renderPhase()}

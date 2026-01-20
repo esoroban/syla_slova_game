@@ -134,6 +134,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .character-image {
@@ -166,9 +167,12 @@ body {
   padding: 24px 32px;
   box-shadow: var(--shadow-medium);
   max-width: 600px;
-  min-height: 100px;
+  min-height: 120px;
   text-align: center;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .dialogue-box::before {
@@ -235,6 +239,7 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   padding: 20px;
+  flex-shrink: 0;
 }
 
 .box {
@@ -908,6 +913,12 @@ body {
 .paper-note-wrapper {
   position: relative;
   z-index: 10;
+  flex-shrink: 0;
+  /* Фіксована висота для стабільності layout */
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .paper-note {
@@ -915,6 +926,9 @@ body {
   padding: 16px 24px;
   min-width: 120px;
   max-width: 280px;
+  /* Фіксована висота щоб картинки не дергались */
+  min-height: 100px;
+  height: auto;
   border-radius: 4px;
   box-shadow:
     2px 2px 8px rgba(0,0,0,0.15),
@@ -923,6 +937,9 @@ body {
   transform: rotate(-2deg);
   transition: transform 0.2s;
   border: 1px solid rgba(200, 180, 100, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .paper-note::before {
@@ -1383,5 +1400,56 @@ body {
   .board-label {
     font-size: 0.8rem;
     padding: 4px 10px;
+  }
+}
+
+/* ====== КНОПКА ЗВУКУ ====== */
+
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-blue);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+.sound-toggle:active {
+  transform: scale(0.95);
+}
+
+.sound-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Адаптивність для кнопки звуку */
+@media (max-width: 600px) {
+  .sound-toggle {
+    width: 40px;
+    height: 40px;
+    top: 15px;
+    right: 15px;
+  }
+
+  .sound-toggle svg {
+    width: 20px;
+    height: 20px;
   }
 }
