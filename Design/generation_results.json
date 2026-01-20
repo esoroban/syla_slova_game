@@ -1,0 +1,266 @@
+{
+  "timestamp": "2026-01-20 06:39:13.800149",
+  "duration": "0:04:28.801531",
+  "results": {
+    "locations": [
+      {
+        "name": "location_01_warehouse",
+        "seed": 242883279,
+        "status": "ok"
+      },
+      {
+        "name": "location_02_tower",
+        "seed": 924095034,
+        "status": "ok"
+      },
+      {
+        "name": "location_03_laboratory",
+        "seed": 1463231032,
+        "status": "ok"
+      },
+      {
+        "name": "location_04_park",
+        "seed": 1949615897,
+        "status": "ok"
+      },
+      {
+        "name": "location_05_arena",
+        "seed": 418107549,
+        "status": "ok"
+      },
+      {
+        "name": "location_06_camp",
+        "seed": 1857542713,
+        "status": "ok"
+      },
+      {
+        "name": "location_07_emotions_city",
+        "seed": 1936759089,
+        "status": "ok"
+      },
+      {
+        "name": "location_08_theater",
+        "seed": 1941833068,
+        "status": "ok"
+      },
+      {
+        "name": "location_09_market",
+        "seed": 1366312259,
+        "status": "ok"
+      },
+      {
+        "name": "location_10_archive",
+        "seed": 1579399378,
+        "status": "ok"
+      },
+      {
+        "name": "location_11_cartographer",
+        "seed": 1924012311,
+        "status": "ok"
+      },
+      {
+        "name": "location_12_slippery_hall",
+        "seed": 1868413019,
+        "status": "ok"
+      },
+      {
+        "name": "location_13_city_heart",
+        "seed": 972715592,
+        "status": "ok"
+      }
+    ],
+    "ui": [
+      {
+        "name": "ui_box_green",
+        "seed": 1600654714,
+        "status": "ok"
+      },
+      {
+        "name": "ui_box_yellow",
+        "seed": 601510536,
+        "status": "ok"
+      },
+      {
+        "name": "ui_box_red",
+        "seed": 1300315660,
+        "status": "ok"
+      },
+      {
+        "name": "ui_card_statement",
+        "seed": 1013815089,
+        "status": "ok"
+      },
+      {
+        "name": "ui_card_answer",
+        "seed": 521048326,
+        "status": "ok"
+      },
+      {
+        "name": "ui_button_yes",
+        "seed": 1147955656,
+        "status": "ok"
+      },
+      {
+        "name": "ui_button_no",
+        "seed": 658446130,
+        "status": "ok"
+      },
+      {
+        "name": "ui_button_next",
+        "seed": 2010718347,
+        "status": "ok"
+      },
+      {
+        "name": "ui_button_hint",
+        "seed": 942938902,
+        "status": "ok"
+      },
+      {
+        "name": "ui_icon_star",
+        "seed": 445690883,
+        "status": "ok"
+      },
+      {
+        "name": "ui_icon_trophy",
+        "seed": 1079895738,
+        "status": "ok"
+      },
+      {
+        "name": "ui_icon_lightbulb",
+        "seed": 1289820291,
+        "status": "ok"
+      },
+      {
+        "name": "ui_icon_map_piece",
+        "seed": 308053431,
+        "status": "ok"
+      },
+      {
+        "name": "ui_progress_bar",
+        "seed": 355517101,
+        "status": "ok"
+      },
+      {
+        "name": "ui_trust_scale",
+        "seed": 2023579603,
+        "status": "ok"
+      }
+    ],
+    "effects": [
+      {
+        "name": "effect_correct",
+        "seed": 270145580,
+        "status": "ok"
+      },
+      {
+        "name": "effect_incorrect",
+        "seed": 1711344844,
+        "status": "ok"
+      },
+      {
+        "name": "effect_victory",
+        "seed": 1136392136,
+        "status": "ok"
+      },
+      {
+        "name": "effect_badge_unlock",
+        "seed": 2008954622,
+        "status": "ok"
+      },
+      {
+        "name": "effect_level_complete",
+        "seed": 1850723592,
+        "status": "ok"
+      }
+    ],
+    "map": [
+      {
+        "name": "map_full_city",
+        "seed": 976257649,
+        "status": "ok"
+      },
+      {
+        "name": "map_puzzle_piece",
+        "seed": 921621056,
+        "status": "ok"
+      },
+      {
+        "name": "map_location_icons",
+        "seed": 1452438912,
+        "status": "ok"
+      }
+    ],
+    "badges": [
+      {
+        "name": "badge_01_sorter",
+        "seed": 457228267,
+        "status": "ok"
+      },
+      {
+        "name": "badge_02_truth_guardian",
+        "seed": 688442831,
+        "status": "ok"
+      },
+      {
+        "name": "badge_03_young_scientist",
+        "seed": 46520716,
+        "status": "ok"
+      },
+      {
+        "name": "badge_04_cause_hunter",
+        "seed": 738659950,
+        "status": "ok"
+      },
+      {
+        "name": "badge_05_peacemaker",
+        "seed": 886661425,
+        "status": "ok"
+      },
+      {
+        "name": "badge_06_scout",
+        "seed": 1075917447,
+        "status": "ok"
+      },
+      {
+        "name": "badge_07_emotion_reader",
+        "seed": 685187665,
+        "status": "ok"
+      },
+      {
+        "name": "badge_08_intonation_master",
+        "seed": 875670890,
+        "status": "ok"
+      },
+      {
+        "name": "badge_09_ad_analyst",
+        "seed": 1420446524,
+        "status": "ok"
+      },
+      {
+        "name": "badge_10_archivist",
+        "seed": 322218723,
+        "status": "ok"
+      },
+      {
+        "name": "badge_11_cartographer",
+        "seed": 2118874972,
+        "status": "ok"
+      },
+      {
+        "name": "badge_12_dodge_catcher",
+        "seed": 798520432,
+        "status": "ok"
+      },
+      {
+        "name": "badge_13_city_hero",
+        "seed": 339464890,
+        "status": "ok"
+      },
+      {
+        "name": "badge_14_perfectionist",
+        "seed": 637374472,
+        "status": "ok"
+      }
+    ]
+  }
+}

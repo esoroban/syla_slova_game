@@ -1,0 +1,61 @@
+{
+  "id": "robot-warehouse",
+  "name": "Робот-кладовщик",
+  "name_en": "Warehouse Robot",
+  "level": 1,
+  "role": "Головний персонаж рівня 1 - Склад фактів",
+
+  "description": {
+    "ua": "Дружній робот-кладовщик, який розгублений через переплутані ящики. Має великі круглі очі та квадратне тіло.",
+    "en": "Friendly warehouse robot, confused because boxes got mixed up. Has big round eyes and boxy body."
+  },
+
+  "visual_traits": {
+    "body": "Boxy silver-blue metallic body with rounded corners",
+    "head": "Rounded rectangular head, slightly tilted",
+    "eyes": "Two large circular LED eyes, sky blue color, expressive",
+    "arms": "Thin mechanical arms with simple claw hands",
+    "legs": "Small wheels or short stubby legs",
+    "height": "Short, child-friendly proportions (chibi-like)",
+    "accessories": [
+      "Small antenna on top of head",
+      "Name tag saying 'SORT-1'",
+      "Tiny clipboard in hand"
+    ],
+    "expression": "Confused but friendly, head tilted to the side"
+  },
+
+  "prompt": "Cute friendly warehouse robot character, boxy silver-blue metallic body with rounded corners, large circular LED eyes glowing sky blue, small antenna on head, thin mechanical arms with claw hands, short stubby legs, holding tiny clipboard, confused expression with tilted head, name tag 'SORT-1' on chest. Style: flat design illustration, soft shadows, rounded shapes, warm friendly colors, children's book illustration style, simple clean background, character design sheet. No realistic textures, no scary elements, no sharp edges.",
+
+  "negative_prompt": "realistic, photorealistic, 3d render, scary, dark, gloomy, sharp edges, complex background, multiple characters, text, watermark, signature, blurry, low quality, distorted",
+
+  "variations_needed": [
+    {
+      "name": "default",
+      "description": "Стандартна поза - трохи розгублений"
+    },
+    {
+      "name": "happy",
+      "description": "Радісний - після правильної відповіді"
+    },
+    {
+      "name": "thinking",
+      "description": "Задумливий - під час питання"
+    },
+    {
+      "name": "celebrating",
+      "description": "Святкує - після завершення рівня"
+    }
+  ],
+
+  "color_palette": {
+    "primary": "#5A9BD5",
+    "secondary": "#C0C0C0",
+    "accent": "#F5A623",
+    "eyes": "#87CEEB"
+  },
+
+  "approved_seed": null,
+  "status": "draft",
+  "notes": ""
+}

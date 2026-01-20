@@ -1,0 +1,1387 @@
+/* Основні стилі гри "Місто зламаних слів" */
+
+:root {
+  /* Кольорова палітра */
+  --primary-blue: #4A90D9;
+  --warm-orange: #F5A623;
+  --soft-green: #7ED321;
+  --gentle-red: #E85A5A;
+  --purple-accent: #9B59B6;
+
+  /* Нейтральні */
+  --bg-light: #F8F9FA;
+  --card-white: #FFFFFF;
+  --text-dark: #2C3E50;
+  --text-light: #7F8C8D;
+
+  /* Кольори ящиків */
+  --box-green: #7ED321;
+  --box-yellow: #F5A623;
+  --box-red: #E85A5A;
+
+  /* Тіні */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+/* ====== КОНТЕЙНЕРИ ====== */
+
+.game-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-screen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* ====== ФОН ====== */
+
+.game-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.game-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+}
+
+.game-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 2vh;
+  gap: 15px;
+}
+
+/* ====== GAME HEADER ====== */
+
+.game-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.timer-display {
+  background: var(--card-white);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-soft);
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.timer-icon {
+  font-size: 1.2rem;
+}
+
+.timer-value {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ====== ПЕРСОНАЖ ====== */
+
+.character-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.character-image {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.character-name {
+  background: var(--card-white);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  color: var(--primary-blue);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ====== ДІАЛОГ ====== */
+
+.dialogue-box {
+  background: var(--card-white);
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: var(--shadow-medium);
+  max-width: 600px;
+  min-height: 100px;
+  text-align: center;
+  position: relative;
+}
+
+.dialogue-box::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 15px solid var(--card-white);
+}
+
+.dialogue-text {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.dialogue-continue-hint {
+  margin-top: 15px;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ====== КАРТКА ТВЕРДЖЕННЯ ====== */
+
+.statement-card {
+  background: var(--card-white);
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: var(--shadow-medium);
+  font-size: 1.3rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 500px;
+  cursor: grab;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statement-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.statement-card.dragging {
+  cursor: grabbing;
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+/* ====== ЯЩИКИ ====== */
+
+.boxes-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.box {
+  width: 150px;
+  height: 180px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.box img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.box-label {
+  margin-top: 5px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.box:hover {
+  transform: scale(1.05);
+}
+
+.box.highlight {
+  animation: pulse 0.5s ease-in-out;
+}
+
+.box.correct {
+  animation: correctPulse 0.5s ease-in-out;
+}
+
+.box.wrong {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes correctPulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.15); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+
+/* ====== КНОПКИ ====== */
+
+.btn {
+  padding: 14px 32px;
+  border-radius: 30px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-success {
+  background: var(--soft-green);
+  color: white;
+}
+
+.btn-warning {
+  background: var(--warm-orange);
+  color: white;
+}
+
+.btn-secondary {
+  background: var(--text-light);
+  color: white;
+}
+
+.btn-continue {
+  background: var(--primary-blue);
+  color: white;
+  margin-top: 15px;
+  padding: 10px 30px;
+  font-size: 1rem;
+  animation: pulse-btn 2s ease-in-out infinite;
+}
+
+@keyframes pulse-btn {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ====== ПРОГРЕС ====== */
+
+.progress-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--soft-green);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ====== ЗІРКИ ====== */
+
+.stars-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+.star {
+  width: 40px;
+  height: 40px;
+  font-size: 32px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.star.earned {
+  animation: starEarned 0.5s ease-out;
+}
+
+.star.empty {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+@keyframes starEarned {
+  0% { transform: scale(0) rotate(-180deg); }
+  50% { transform: scale(1.3) rotate(0); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* ====== РЕЗУЛЬТАТ ====== */
+
+.result-screen {
+  text-align: center;
+  color: white;
+  width: 100%;
+  max-width: 500px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.result-title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  margin-bottom: 5px;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.result-stats {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 15px 20px;
+  margin: 5px 0;
+  color: var(--text-dark);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  width: 100%;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 1rem;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row span:first-child {
+  color: var(--text-light);
+}
+
+.stat-row span:last-child {
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+/* Кнопки результата */
+.result-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.btn-large {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+}
+
+/* ====== ПІДКАЗКА ====== */
+
+.hint-box {
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  border-left: 4px solid var(--warm-orange);
+}
+
+.hint-title {
+  font-weight: bold;
+  color: var(--warm-orange);
+  margin-bottom: 8px;
+}
+
+.hint-text {
+  color: var(--text-dark);
+}
+
+/* ====== ЕФЕКТИ ====== */
+
+.effect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.effect-image {
+  width: 200px;
+  height: 200px;
+  animation: effectPop 0.5s ease-out forwards;
+}
+
+@keyframes effectPop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ====== КАРТА МІСТА ====== */
+
+.city-map {
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+}
+
+.city-map img {
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: var(--shadow-medium);
+}
+
+.level-marker {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: var(--shadow-soft);
+}
+
+.level-marker.available {
+  background: var(--soft-green);
+  color: white;
+}
+
+.level-marker.locked {
+  background: var(--text-light);
+  color: white;
+  cursor: not-allowed;
+}
+
+.level-marker.completed {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.level-marker:hover:not(.locked) {
+  transform: scale(1.2);
+}
+
+/* ====== ДОМАШНЄ ЗАВДАННЯ ====== */
+
+.homework-form {
+  background: var(--card-white);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.homework-title {
+  font-size: 1.5rem;
+  color: var(--primary-blue);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.homework-field {
+  margin-bottom: 20px;
+}
+
+.homework-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.homework-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.homework-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+/* ====== АДАПТИВНІСТЬ ====== */
+
+/* Планшет (768px - 1024px) */
+@media (max-width: 1024px) {
+  .game-content {
+    max-width: 700px;
+    padding: 0 15px;
+  }
+
+  .result-screen {
+    max-width: 450px;
+  }
+
+  .badge-earned {
+    padding: 15px;
+  }
+
+  .badge-image {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Маленький планшет и большой телефон (600px - 768px) */
+@media (max-width: 768px) {
+  .game-screen {
+    padding: 15px;
+  }
+
+  .game-content {
+    gap: 15px;
+  }
+
+  .result-screen {
+    padding: 15px;
+  }
+
+  .result-buttons {
+    gap: 10px;
+  }
+
+  .stars-container {
+    gap: 8px;
+  }
+
+  .star {
+    width: 40px;
+    height: 40px;
+    font-size: 32px;
+  }
+
+  .character-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .dialogue-box {
+    padding: 18px 24px;
+  }
+}
+
+/* Телефон (до 600px) */
+@media (max-width: 600px) {
+  .game-screen {
+    padding: 10px;
+    justify-content: flex-start;
+    padding-top: 20px;
+  }
+
+  .game-content {
+    gap: 12px;
+  }
+
+  .boxes-container {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .box {
+    width: 95px;
+    height: 120px;
+  }
+
+  .box img {
+    width: 85px;
+    height: 85px;
+  }
+
+  .box-label {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .paper-note {
+    padding: 12px 16px;
+    max-width: 240px;
+    min-width: 100px;
+  }
+
+  .paper-note-text {
+    font-size: 0.9rem;
+  }
+
+  .dialogue-box {
+    padding: 15px 20px;
+    border-radius: 16px;
+  }
+
+  .dialogue-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .character-image {
+    width: 90px;
+    height: 90px;
+  }
+
+  .character-name {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .result-screen {
+    padding: 10px;
+  }
+
+  .result-stats {
+    border-radius: 12px;
+  }
+
+  .stars-container {
+    gap: 6px;
+  }
+
+  .star {
+    width: 35px;
+    height: 35px;
+    font-size: 28px;
+  }
+
+  .badge-earned {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .badge-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .badge-name {
+    font-size: 1rem;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+
+  .btn-large {
+    padding: 14px 28px;
+  }
+
+  .game-header {
+    gap: 10px;
+  }
+
+  .timer-display {
+    padding: 6px 12px;
+    min-width: 70px;
+  }
+
+  .timer-icon {
+    font-size: 1rem;
+  }
+
+  .timer-value {
+    font-size: 0.95rem;
+  }
+
+  .progress-text {
+    font-size: 0.85rem;
+  }
+}
+
+/* Очень маленький телефон (до 360px) */
+@media (max-width: 360px) {
+  .box {
+    width: 80px;
+    height: 105px;
+  }
+
+  .box img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .box-label {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .paper-note {
+    max-width: 200px;
+  }
+
+  .paper-note-text {
+    font-size: 0.85rem;
+  }
+
+  .star {
+    width: 30px;
+    height: 30px;
+    font-size: 24px;
+  }
+
+  .badge-image {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ====== ГОЛОВНИЙ ЕКРАН ====== */
+
+.title-screen {
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.game-title {
+  font-size: 3rem;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+}
+
+.game-subtitle {
+  font-size: 1.3rem;
+  opacity: 0.9;
+  margin-bottom: 40px;
+}
+
+/* ====== БЕЙДЖ ====== */
+
+.badge-earned {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+}
+
+.badge-image {
+  width: 70px;
+  height: 70px;
+  animation: badgeAppear 0.6s ease-out;
+}
+
+@keyframes badgeAppear {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.badge-name {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--primary-blue);
+}
+
+/* ====== БУМАЖКА (PAPER NOTE) ====== */
+
+.paper-note-wrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.paper-note {
+  background: linear-gradient(135deg, #fffef0 0%, #fff9c4 100%);
+  padding: 16px 24px;
+  min-width: 120px;
+  max-width: 280px;
+  border-radius: 4px;
+  box-shadow:
+    2px 2px 8px rgba(0,0,0,0.15),
+    inset 0 0 20px rgba(255,255,255,0.5);
+  position: relative;
+  transform: rotate(-2deg);
+  transition: transform 0.2s;
+  border: 1px solid rgba(200, 180, 100, 0.3);
+}
+
+.paper-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      rgba(200, 180, 150, 0.15) 28px
+    );
+  pointer-events: none;
+}
+
+.paper-note-pin {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.paper-note-pin::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+}
+
+.paper-note-text {
+  font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.paper-note-wrapper.note-dropping {
+  animation: noteDrop 0.5s ease-in forwards;
+}
+
+.paper-note-wrapper.note-dropping .paper-note {
+  animation: noteFold 0.5s ease-in forwards;
+  border-color: var(--note-color, #4CAF50);
+  box-shadow: 0 0 15px var(--note-color, #4CAF50);
+}
+
+@keyframes noteDrop {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-2deg) scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: translateX(0) translateY(-30px) rotate(5deg) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--drop-x)) translateY(var(--drop-y)) rotate(25deg) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes noteFold {
+  0% {
+    transform: perspective(500px) rotateX(0deg);
+  }
+  50% {
+    transform: perspective(500px) rotateX(20deg);
+  }
+  100% {
+    transform: perspective(500px) rotateX(45deg);
+  }
+}
+
+/* Старі стилі для statement-card-wrapper (для Level02) */
+.statement-card-wrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.statement-card-wrapper.card-dropping {
+  animation: cardDrop 0.5s ease-in forwards;
+}
+
+.statement-card-wrapper.card-dropping .statement-card {
+  animation: cardShrink 0.5s ease-in forwards;
+  border: 3px solid var(--card-color, #4CAF50);
+}
+
+@keyframes cardDrop {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: translateX(calc(var(--drop-x) * 0.1)) translateY(-20px) rotate(-5deg) scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--drop-x)) translateY(var(--drop-y)) rotate(15deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes cardShrink {
+  0% {
+    box-shadow: var(--shadow-medium);
+  }
+  50% {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+  100% {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+}
+
+/* Підсвітка коробки при анімації */
+.box.box-highlight {
+  animation: boxGlow 0.6s ease-in-out;
+  transform: scale(1.1);
+}
+
+@keyframes boxGlow {
+  0% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.3);
+    transform: scale(1.15);
+  }
+  100% {
+    filter: brightness(1);
+    transform: scale(1.1);
+  }
+}
+
+/* Ефект "ловлення" картки */
+.box.box-catching::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
+  animation: catchFlash 0.3s ease-out;
+}
+
+@keyframes catchFlash {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ====== КАРТА - НАСТІЛЬНА ГРА ====== */
+
+.map-screen {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto 20px;
+}
+
+.map-title {
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  font-size: 1.5rem;
+}
+
+.stars-counter {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
+}
+
+/* Ігрове поле */
+.board-game {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: rgba(139, 90, 43, 0.3);
+  border-radius: 20px;
+  border: 4px solid rgba(139, 90, 43, 0.5);
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+}
+
+/* Доріжка SVG */
+.board-path {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Станція */
+.station {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 5;
+}
+
+.station-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+  border: 4px solid #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+/* Пройдена станція */
+.station.completed .station-circle {
+  background: linear-gradient(135deg, #7ED321 0%, #5cb11a 100%);
+  border-color: #4a9c12;
+  color: white;
+}
+
+/* Поточна станція */
+.station.current .station-circle {
+  background: linear-gradient(135deg, #4A90D9 0%, #357abd 100%);
+  border-color: #2a6299;
+  color: white;
+  animation: stationPulse 1.5s infinite;
+}
+
+/* Заблокована станція */
+.station.locked .station-circle {
+  background: linear-gradient(135deg, #888 0%, #666 100%);
+  border-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.station.locked {
+  cursor: not-allowed;
+}
+
+/* Hover ефект */
+.station:not(.locked):hover .station-circle {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+@keyframes stationPulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(74, 144, 217, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(74, 144, 217, 0.8);
+  }
+}
+
+/* Фішка гравця */
+.player-token {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  animation: playerBounce 1s infinite;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+@keyframes playerBounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+
+/* Зірочки біля станції */
+.station-stars {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 0.9rem;
+  background: #FFD700;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Тултіп */
+.station-tooltip {
+  position: absolute;
+  bottom: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 100;
+  text-align: center;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+.station-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: white;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltip-title {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #2C3E50;
+  margin-bottom: 4px;
+}
+
+.tooltip-skill {
+  font-size: 0.85rem;
+  color: #7F8C8D;
+  margin-bottom: 6px;
+}
+
+.tooltip-status {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.station.completed .station-tooltip .tooltip-status {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.station.current .station-tooltip .tooltip-status {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.station.locked .station-tooltip .tooltip-status {
+  background: #f5f5f5;
+  color: #757575;
+}
+
+/* Написи СТАРТ і ФІНІШ */
+.board-label {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1rem;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  padding: 6px 14px;
+  border-radius: 12px;
+}
+
+.start-label {
+  background: linear-gradient(135deg, #7ED321 0%, #5cb11a 100%);
+}
+
+.finish-label {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #333;
+  text-shadow: none;
+}
+
+/* Адаптивність */
+@media (max-width: 600px) {
+  .station-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .player-token {
+    font-size: 1.5rem;
+    top: -28px;
+  }
+
+  .station-tooltip {
+    min-width: 150px;
+    padding: 10px 12px;
+  }
+
+  .tooltip-title {
+    font-size: 0.9rem;
+  }
+
+  .tooltip-skill {
+    font-size: 0.75rem;
+  }
+
+  .map-title {
+    font-size: 1.2rem;
+  }
+
+  .board-label {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+}
