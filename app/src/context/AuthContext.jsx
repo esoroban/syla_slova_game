@@ -141,6 +141,69 @@ export function AuthProvider({ children }) {
     localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
   }, []);
 
+  // Send SMS code for password reset
+  const sendCode = useCallback(async (phone) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/send-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Помилка надсилання коду' };
+      }
+
+      return { success: true, phone: data.phone || phone };
+    } catch (err) {
+      return { success: false, error: 'Немає з\'єднання з сервером' };
+    }
+  }, []);
+
+  // Verify SMS code
+  const verifyCode = useCallback(async (phone, code) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Невірний код' };
+      }
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: 'Немає з\'єднання з сервером' };
+    }
+  }, []);
+
+  // Reset password
+  const resetPassword = useCallback(async (phone, password) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Помилка зміни пароля' };
+      }
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: 'Немає з\'єднання з сервером' };
+    }
+  }, []);
+
   const value = {
     user,
     loading,
@@ -150,6 +213,9 @@ export function AuthProvider({ children }) {
     logout,
     getToken,
     updateProfile,
+    sendCode,
+    verifyCode,
+    resetPassword,
     isAuthenticated: !!user
   };
 

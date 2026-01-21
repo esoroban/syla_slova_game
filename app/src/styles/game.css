@@ -1798,6 +1798,97 @@ body {
   color: #999;
 }
 
+/* Кнопка "Забули пароль?" */
+.auth-forgot-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #5c9ce6;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.auth-forgot-btn:hover:not(:disabled) {
+  color: #7ab3f0;
+  text-decoration: underline;
+}
+
+.auth-forgot-btn:disabled {
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Відображення номера телефону */
+.auth-phone-display {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5c9ce6;
+  margin: 8px 0 20px;
+}
+
+/* Поле вводу коду */
+.code-input {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.5rem;
+  text-align: center;
+  letter-spacing: 8px;
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.code-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 8px;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: #5c9ce6;
+  box-shadow: 0 0 0 3px rgba(92, 156, 230, 0.2);
+}
+
+/* Підказка таймера */
+.auth-hint {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Кнопка повторної відправки коду */
+.auth-resend-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #5c9ce6;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.auth-resend-btn:hover:not(:disabled) {
+  color: #7ab3f0;
+  text-decoration: underline;
+}
+
+.auth-resend-btn:disabled {
+  color: #666;
+  cursor: not-allowed;
+}
+
 /* Адаптивність авторизації */
 @media (max-width: 480px) {
   .auth-card {

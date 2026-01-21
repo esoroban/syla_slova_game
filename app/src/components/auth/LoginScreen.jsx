@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 /**
  * Екран авторизації для гри
- * Підтримує вхід та реєстрацію
+ * Підтримує вхід, реєстрацію та відновлення пароля
  */
 export default function LoginScreen({ onSkip }) {
-  const { login, register, loading } = useAuth();
+  const { login, register, sendCode, verifyCode, resetPassword, loading } = useAuth();
 
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  // Mode: 'login' | 'register' | 'forgot' | 'forgot_code' | 'new_password'
+  const [mode, setMode] = useState('login');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,6 +17,20 @@ export default function LoginScreen({ onSkip }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Password recovery state
+  const [formattedPhone, setFormattedPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      // Timer cleanup handled by the interval itself
+    };
+  }, []);
 
   // Format phone for display
   const handlePhoneChange = (e) => {
@@ -27,6 +42,20 @@ export default function LoginScreen({ onSkip }) {
   const formatPhone = (phone) => {
     const digits = phone.replace(/\D/g, '');
     return `+380${digits}`;
+  };
+
+  // Start resend timer (60 seconds)
+  const startResendTimer = () => {
+    setResendTimer(60);
+    const interval = setInterval(() => {
+      setResendTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handleLogin = async (e) => {
@@ -73,6 +102,93 @@ export default function LoginScreen({ onSkip }) {
     setIsSubmitting(false);
   };
 
+  // Step 1 of password recovery: send code
+  const handleForgotSendCode = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const phoneFormatted = formatPhone(phone);
+    const result = await sendCode(phoneFormatted);
+
+    if (result.success) {
+      setFormattedPhone(result.phone || phoneFormatted);
+      setMode('forgot_code');
+      startResendTimer();
+    } else {
+      setError(result.error);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  // Step 2: verify code
+  const handleForgotVerifyCode = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await verifyCode(formattedPhone, code);
+
+    if (result.success) {
+      setMode('new_password');
+    } else {
+      setError(result.error);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  // Step 3: set new password
+  const handleSetNewPassword = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (newPassword !== confirmPassword) {
+      setError('Паролі не співпадають');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('Пароль має бути не менше 6 символів');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const result = await resetPassword(formattedPhone, newPassword);
+
+    if (result.success) {
+      // Password changed successfully - go to login
+      setPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setCode('');
+      setMode('login');
+      setError(null);
+      alert('Пароль успішно змінено! Увійдіть з новим паролем.');
+    } else {
+      setError(result.error);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  // Resend code
+  const handleResendCode = async () => {
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await sendCode(formattedPhone);
+    if (result.success) {
+      startResendTimer();
+    } else {
+      setError(result.error);
+    }
+
+    setIsSubmitting(false);
+  };
+
   const toggleMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
     setError(null);
@@ -80,6 +196,233 @@ export default function LoginScreen({ onSkip }) {
     setConfirmPassword('');
   };
 
+  const goToForgot = () => {
+    setMode('forgot');
+    setError(null);
+    setCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const goToLogin = () => {
+    setMode('login');
+    setError(null);
+    setPassword('');
+    setCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  // Forgot password - Step 1: Enter phone
+  if (mode === 'forgot') {
+    return (
+      <div className="auth-screen">
+        <div className="auth-background" />
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-logo">
+              <span className="auth-logo-icon">🔑</span>
+              <h1 className="auth-title">Відновлення пароля</h1>
+            </div>
+
+            <p className="auth-subtitle">
+              Введіть номер телефону для отримання коду
+            </p>
+
+            {error && (
+              <div className="auth-error">{error}</div>
+            )}
+
+            <form onSubmit={handleForgotSendCode} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="forgot-phone">Номер телефону</label>
+                <div className="phone-input-wrapper">
+                  <span className="phone-prefix">+380</span>
+                  <input
+                    type="tel"
+                    id="forgot-phone"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="50 123 45 67"
+                    maxLength={12}
+                    required
+                    disabled={isSubmitting}
+                    autoComplete="tel"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="auth-submit-btn"
+                disabled={isSubmitting || loading || phone.replace(/\s/g, '').length < 9}
+              >
+                {isSubmitting ? 'Надсилаємо...' : 'Отримати код'}
+              </button>
+            </form>
+
+            <div className="auth-toggle">
+              <button onClick={goToLogin} disabled={isSubmitting}>
+                Повернутися до входу
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Forgot password - Step 2: Enter code
+  if (mode === 'forgot_code') {
+    return (
+      <div className="auth-screen">
+        <div className="auth-background" />
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-logo">
+              <span className="auth-logo-icon">📱</span>
+              <h1 className="auth-title">Введіть код</h1>
+            </div>
+
+            <p className="auth-subtitle">
+              Ми надіслали SMS на номер:
+            </p>
+            <p className="auth-phone-display">{formattedPhone}</p>
+
+            {error && (
+              <div className="auth-error">{error}</div>
+            )}
+
+            <form onSubmit={handleForgotVerifyCode} className="auth-form">
+              <div className="form-group">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                  className="code-input"
+                  autoFocus
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="auth-submit-btn"
+                disabled={isSubmitting || loading || code.length !== 6}
+              >
+                {isSubmitting ? 'Перевіряємо...' : 'Підтвердити'}
+              </button>
+            </form>
+
+            {resendTimer > 0 ? (
+              <p className="auth-hint">
+                Надіслати код повторно через {resendTimer} сек
+              </p>
+            ) : (
+              <button
+                className="auth-resend-btn"
+                onClick={handleResendCode}
+                disabled={isSubmitting}
+              >
+                Надіслати код повторно
+              </button>
+            )}
+
+            <div className="auth-toggle">
+              <button onClick={goToForgot} disabled={isSubmitting}>
+                Змінити номер
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Forgot password - Step 3: Set new password
+  if (mode === 'new_password') {
+    return (
+      <div className="auth-screen">
+        <div className="auth-background" />
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-logo">
+              <span className="auth-logo-icon">🔐</span>
+              <h1 className="auth-title">Новий пароль</h1>
+            </div>
+
+            <p className="auth-subtitle">
+              Придумайте новий пароль
+            </p>
+
+            {error && (
+              <div className="auth-error">{error}</div>
+            )}
+
+            <form onSubmit={handleSetNewPassword} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="newPassword">Новий пароль</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    id="newPassword"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Мінімум 6 символів"
+                    required
+                    minLength={6}
+                    disabled={isSubmitting}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    tabIndex={-1}
+                  >
+                    {showNewPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmNewPassword">Повторіть пароль</label>
+                <input
+                  type="password"
+                  id="confirmNewPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Повторіть пароль"
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="auth-submit-btn"
+                disabled={isSubmitting || loading}
+              >
+                {isSubmitting ? 'Зберігаємо...' : 'Зберегти пароль'}
+              </button>
+            </form>
+
+            <div className="auth-toggle">
+              <button onClick={goToLogin} disabled={isSubmitting}>
+                Скасувати
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main login/register screen
   return (
     <div className="auth-screen">
       <div className="auth-background" />
@@ -151,6 +494,15 @@ export default function LoginScreen({ onSkip }) {
                 disabled={isSubmitting || loading}
               >
                 {isSubmitting ? 'Вхід...' : 'Увійти'}
+              </button>
+
+              <button
+                type="button"
+                className="auth-forgot-btn"
+                onClick={goToForgot}
+                disabled={isSubmitting}
+              >
+                Забули пароль?
               </button>
             </form>
           ) : (
