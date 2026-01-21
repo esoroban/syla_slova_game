@@ -11,7 +11,20 @@ class AudioManager {
     this.onEndCallback = null;
 
     // Базовий шлях до аудіо файлів
-    this.basePath = '/audio';
+    // В Electron використовуємо відносний шлях, в браузері - абсолютний
+    this.basePath = this.detectBasePath();
+  }
+
+  /**
+   * Визначити базовий шлях залежно від середовища
+   */
+  detectBasePath() {
+    // Якщо запущено в Electron (file:// протокол)
+    if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+      return './audio';
+    }
+    // Веб-версія
+    return '/audio';
   }
 
   /**

@@ -1435,8 +1435,8 @@ body {
 }
 
 .sound-toggle svg {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
 }
 
 /* Адаптивність для кнопки звуку */
@@ -1449,7 +1449,7 @@ body {
   }
 
   .sound-toggle svg {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
   }
 }
