@@ -1,7 +1,7 @@
 import React from 'react';
 import { MAP } from '../../../data/assets';
 
-export default function TitleScreen({ onStart, onContinue, hasProgress }) {
+export default function TitleScreen({ onStart, onContinue, hasProgress, user, isGuest, onLogout }) {
   return (
     <div className="game-container">
       <div
@@ -11,6 +11,26 @@ export default function TitleScreen({ onStart, onContinue, hasProgress }) {
           filter: 'blur(5px)'
         }}
       />
+
+      {/* User info header */}
+      {(user || isGuest) && (
+        <div className="user-header">
+          <div className="user-info">
+            {user ? (
+              <span className="user-name">
+                👤 {user.nickname || user.fullName || 'Гравець'}
+              </span>
+            ) : (
+              <span className="user-name guest">
+                👻 Гостьовий режим
+              </span>
+            )}
+          </div>
+          <button className="logout-btn" onClick={onLogout}>
+            Вийти
+          </button>
+        </div>
+      )}
 
       <div className="game-screen">
         <div className="title-screen">
@@ -37,6 +57,12 @@ export default function TitleScreen({ onStart, onContinue, hasProgress }) {
               </button>
             )}
           </div>
+
+          {isGuest && (
+            <p className="guest-warning">
+              ⚠️ В гостьовому режимі прогрес не зберігається на сервері
+            </p>
+          )}
         </div>
       </div>
     </div>

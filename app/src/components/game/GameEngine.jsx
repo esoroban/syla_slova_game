@@ -15,7 +15,7 @@ const SCREENS = {
   LEVEL: 'level'
 };
 
-function GameEngineInner() {
+function GameEngineInner({ user, isGuest, onLogout }) {
   const gameStore = useGameStore();
   const [screen, setScreen] = useState(SCREENS.TITLE);
   const [selectedLevel, setSelectedLevel] = useState(null);
@@ -105,6 +105,9 @@ function GameEngineInner() {
             hasProgress={hasProgress}
             onStart={handleNewGame}
             onContinue={handleContinue}
+            user={user}
+            isGuest={isGuest}
+            onLogout={onLogout}
           />
         );
 
@@ -187,10 +190,10 @@ function GameEngineInner() {
 }
 
 // Обгортка з провайдером
-export default function GameEngine() {
+export default function GameEngine({ user, isGuest, onLogout }) {
   return (
     <GameProvider>
-      <GameEngineInner />
+      <GameEngineInner user={user} isGuest={isGuest} onLogout={onLogout} />
     </GameProvider>
   );
 }
