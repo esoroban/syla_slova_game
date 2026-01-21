@@ -11,15 +11,23 @@
 ├── app/                    # React + Vite приложение
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── auth/
+│   │   │   │   └── LoginScreen.jsx   # ✅ ГОТОВО
 │   │   │   └── game/
 │   │   │       ├── levels/
 │   │   │       │   ├── Level01Warehouse.jsx
 │   │   │       │   ├── Level02Tower.jsx
 │   │   │       │   └── UniversalLevel.jsx
 │   │   │       └── ui/
+│   │   ├── config/
+│   │   │   └── api.js               # ✅ ГОТОВО - API URL config
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx      # ✅ ГОТОВО - Auth context
 │   │   ├── data/
-│   │   │   ├── levels.js       # Импорт данных уровней
-│   │   │   └── assets.js       # Пути к изображениям
+│   │   │   ├── levels.js
+│   │   │   └── assets.js
+│   │   ├── stores/
+│   │   │   └── gameStore.jsx        # Локальный прогресс
 │   │   ├── utils/
 │   │   │   ├── audioManager.js
 │   │   │   └── shuffle.js
@@ -29,7 +37,6 @@
 ├── Content/
 │   └── levels/
 │       ├── level-01-warehouse.json
-│       ├── level-02-tower.json
 │       └── ... (13 файлов)
 └── docs/
     └── API_REQUIREMENTS.md    # Требования к API
@@ -59,28 +66,44 @@
 
 ---
 
-## Задача
+## Что уже реализовано на фронтенде ✅
 
-Нужно интегрировать игру с сервером для:
+### 1. Авторизация (ГОТОВО)
 
-1. **Авторизации учеников**:
-   - Экран входа/регистрации в игре
-   - Сохранение токена (localStorage + Electron storage)
-   - Автоматический вход при наличии валидного токена
+**Файлы:**
+- `/Game/app/src/config/api.js` - конфигурация API URL
+- `/Game/app/src/context/AuthContext.jsx` - контекст авторизации
+- `/Game/app/src/components/auth/LoginScreen.jsx` - экран входа/регистрации
 
-2. **Сохранения прогресса на сервер**:
-   - После прохождения уровня отправлять результаты
-   - Данные: звезды, очки, правильные/неправильные ответы, время, дата
-   - Разблокировка следующих уровней
+**Функционал:**
+- Вход по телефону (+380) и паролю
+- Регистрация с никнеймом
+- Гостевой режим (игра без авторизации)
+- Сохранение токена в localStorage
+- Автовход при наличии токена
+- Валидация токена при старте
+- Отображение имени пользователя в шапке игры
+- Кнопка "Вийти" (logout)
 
-3. **Сохранения домашних заданий**:
-   - Текстовые ответы (факт/мнение/вигадка) отправлять на сервер
-   - Учитель может просматривать в своем кабинете
+**Конфигурация API:**
+```javascript
+// /Game/app/src/config/api.js
+export const API_URL = getApiUrl(); // localhost:3001 или VITE_API_URL
+export const STORAGE_KEYS = {
+  TOKEN: 'game_student_token',
+  PROFILE: 'game_student_profile',
+  PROGRESS: 'game_progress',
+  PENDING_RESULTS: 'game_pending_results'
+};
+```
 
-4. **Офлайн поддержки**:
-   - Игра работает без интернета
-   - Результаты сохраняются локально
-   - Синхронизация при восстановлении связи
+### 2. Локальный прогресс (ГОТОВО)
+
+**Файл:** `/Game/app/src/stores/gameStore.jsx`
+
+- Сохранение прогресса в localStorage
+- Разблокировка уровней
+- Подсчет звезд и бейджей
 
 ---
 
@@ -142,36 +165,112 @@ CREATE TABLE game_badges (
 ```
 
 2. **Создать роуты** `/src/routes/game.js`:
-   - `POST /api/game/levels/:levelId/result` - сохранить результат
+   - `POST /api/game/levels/:levelId/result` - сохранить результат уровня
    - `POST /api/game/levels/:levelId/homework` - сохранить домашку
-   - `GET /api/game/progress` - получить прогресс
+   - `GET /api/game/progress` - получить прогресс (уровни, звезды, бейджи)
    - `POST /api/game/sync` - синхронизировать офлайн данные
 
-### На фронтенде (добавить в `/Game/app/`)
+3. **Добавить в `server.js`**:
+```javascript
+const gameRoutes = require('./routes/game');
+app.use('/api/game', gameRoutes);
+```
 
-1. **Создать сервисы** в `/src/services/`:
-   - `authService.js` - работа с авторизацией
-   - `gameApi.js` - запросы к игровому API
-   - `storageService.js` - localStorage + IndexedDB
+### На фронтенде (модифицировать `/Game/app/`)
 
-2. **Создать контекст** `/src/context/AuthContext.jsx`:
-   - Хранение состояния авторизации
-   - useAuth() хук
+1. **Создать сервис** `/src/services/gameApi.js`:
+```javascript
+import { API_URL, STORAGE_KEYS } from '../config/api';
 
-3. **Создать экраны**:
-   - `LoginScreen.jsx` - вход
-   - `RegisterScreen.jsx` - регистрация
-   - Модифицировать `App.jsx` для проверки авторизации
+const getToken = () => localStorage.getItem(STORAGE_KEYS.TOKEN);
 
-4. **Модифицировать уровни**:
-   - После `onComplete` отправлять результат на сервер
-   - Показывать ошибку при неудаче (но не блокировать игру)
+export async function saveResult(levelId, result) {
+  const token = getToken();
+  if (!token) {
+    // Гостевой режим - сохранить локально для синхронизации
+    savePendingResult(levelId, result);
+    return { success: true, offline: true };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/game/levels/${levelId}/result`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(result)
+    });
+
+    if (!res.ok) throw new Error('Failed to save');
+    return { success: true };
+  } catch (err) {
+    savePendingResult(levelId, result);
+    return { success: true, offline: true };
+  }
+}
+
+export async function getProgress() {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_URL}/api/game/progress`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+function savePendingResult(levelId, result) {
+  const pending = JSON.parse(localStorage.getItem(STORAGE_KEYS.PENDING_RESULTS) || '[]');
+  pending.push({ levelId, result, timestamp: Date.now() });
+  localStorage.setItem(STORAGE_KEYS.PENDING_RESULTS, JSON.stringify(pending));
+}
+
+export async function syncPendingResults() {
+  const token = getToken();
+  if (!token) return;
+
+  const pending = JSON.parse(localStorage.getItem(STORAGE_KEYS.PENDING_RESULTS) || '[]');
+  if (pending.length === 0) return;
+
+  try {
+    const res = await fetch(`${API_URL}/api/game/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ results: pending })
+    });
+
+    if (res.ok) {
+      localStorage.removeItem(STORAGE_KEYS.PENDING_RESULTS);
+    }
+  } catch {
+    // Попробуем позже
+  }
+}
+```
+
+2. **Модифицировать `GameEngine.jsx`**:
+   - При старте: загрузить прогресс с сервера (если авторизован)
+   - При завершении уровня: отправить результат на сервер
+   - При подключении интернета: синхронизировать
+
+3. **Модифицировать компоненты уровней**:
+   - Добавить `totalTime` в результат (уже есть таймер в большинстве)
+   - Добавить `completedAt: new Date().toISOString()`
 
 ---
 
 ## Данные которые отправляются при завершении уровня
 
-Сейчас в компонентах уровней (`Level01Warehouse.jsx`, etc.) при завершении вызывается:
+Сейчас в компонентах уровней вызывается:
 
 ```javascript
 onComplete({
@@ -190,64 +289,63 @@ onComplete({
 
 Нужно добавить:
 - `totalTime` - общее время в секундах
-- `retryCount` - количество повторных попыток
-- `completedAt` - дата/время завершения
-
----
-
-## Конфигурация
-
-API URL должен быть настраиваемым:
-- Development: `http://localhost:3001`
-- Production: `https://api.sylaslova.com` (или другой)
-- Electron: тот же что и web
-
-Использовать переменную окружения `VITE_API_URL`.
+- `completedAt` - дата/время завершения (ISO string)
 
 ---
 
 ## Файлы для изучения
 
+### На бекенде:
 1. `/prompter-system/backend/src/routes/student.js` - существующие роуты учеников
 2. `/prompter-system/backend/src/auth.js` - авторизация и middleware
 3. `/prompter-system/backend/src/db/index.js` - работа с БД
-4. `/Game/app/src/components/game/levels/Level01Warehouse.jsx` - пример уровня
-5. `/Game/app/src/data/levels.js` - структура данных уровней
-6. `/Game/docs/API_REQUIREMENTS.md` - полные требования к API
+
+### На фронтенде:
+1. `/Game/app/src/config/api.js` - конфигурация API
+2. `/Game/app/src/context/AuthContext.jsx` - авторизация (ГОТОВО)
+3. `/Game/app/src/components/auth/LoginScreen.jsx` - экран входа (ГОТОВО)
+4. `/Game/app/src/stores/gameStore.jsx` - локальный прогресс
+5. `/Game/app/src/components/game/GameEngine.jsx` - главный компонент игры
+6. `/Game/app/src/components/game/levels/Level01Warehouse.jsx` - пример уровня
+7. `/Game/docs/API_REQUIREMENTS.md` - полные требования к API
 
 ---
 
 ## Важные моменты
 
 1. **Не блокировать игру** если нет интернета или сервер недоступен
-2. **Сохранять локально** и синхронизировать потом
-3. **Не дублировать авторизацию** - использовать существующую из student.js
-4. **JWT токен** сохранять в localStorage (web) и Electron storage (desktop)
+2. **Сохранять локально** и синхронизировать потом (PENDING_RESULTS)
+3. **Не дублировать авторизацию** - она уже реализована в AuthContext
+4. **JWT токен** уже сохраняется в localStorage (ключ: `game_student_token`)
 5. **CORS** настроить для игровых доменов
 6. **Валидация на сервере** - проверять что scores разумные (анти-чит)
+7. **Гостевой режим** - локальный прогресс, без синхронизации
 
 ---
 
 ## Приоритет реализации
 
 ### Фаза 1 (MVP):
-1. Авторизация в игре (логин/регистрация)
-2. Сохранение результатов уровней
-3. Получение прогресса (разблокировка уровней)
-4. Локальное хранение для офлайн
+1. ✅ Авторизация в игре (ГОТОВО)
+2. Создать миграцию для игровых таблиц
+3. Создать роуты `/api/game/*`
+4. Создать `gameApi.js` сервис
+5. Подключить сохранение результатов в GameEngine
+6. Получение прогресса с сервера при старте
 
 ### Фаза 2:
 1. Сохранение домашних заданий
-2. Синхронизация офлайн данных
+2. Синхронизация офлайн данных (sync endpoint)
 3. Бейджи
+4. Кабинет учителя - просмотр результатов учеников
 
 ---
 
 ## Начни с:
 
-1. Изучи существующие файлы (особенно student.js и Level01Warehouse.jsx)
-2. Создай миграцию для игровых таблиц
-3. Создай роуты для игрового API
-4. Создай сервисы на фронтенде
-5. Добавь экраны авторизации
-6. Подключи отправку результатов в компонентах уровней
+1. Изучи существующие файлы бекенда (student.js, auth.js)
+2. Изучи готовую авторизацию на фронте (AuthContext.jsx, api.js)
+3. Создай миграцию для игровых таблиц
+4. Создай роуты `/api/game/*` для сохранения и получения прогресса
+5. Создай `gameApi.js` сервис на фронтенде
+6. Подключи сохранение результатов в `GameEngine.jsx`
